@@ -3,7 +3,7 @@
 const LINE_REGEX = r"(\d+)-(\d+) (\w): (\w+)"
 
 abstract type Policy end
-is_valid(s::AbstractString, p::Policy) = error("Not Implemented")
+is_valid(::AbstractString, ::Policy) = error("Not Implemented")
 
 struct CountPolicy <: Policy
     range::AbstractRange
@@ -31,8 +31,8 @@ for line in eachline("day2/input.txt")
 
     # if there is data
     if !isnothing(groups)
-        min_r = tryparse(Int64, groups[1])
-        max_r = tryparse(Int64, groups[2])
+        min_r = parse(Int64, groups[1])
+        max_r = parse(Int64, groups[2])
         char = first(groups[3])
         push!(passwords,
             # populate 
@@ -45,7 +45,7 @@ end
 Base.show(io::IO, p::Password) = print(io, "$(p.policy) in $(p.pw)")
 
 function is_valid(s::AbstractString, p::CountPolicy)
-    char_count = count(i->i==p.char, s)
+    char_count = count(i -> i==p.char, s)
     return char_count in p.range
 end
 
