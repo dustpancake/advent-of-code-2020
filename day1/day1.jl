@@ -46,19 +46,6 @@ function find_two()
 end
 
 
-function get_generator()
-    # use closure to hold state
-    index = 0
-
-    return function () 
-        if index >= length(numbers)
-            error("generator empty")
-        end
-        index += 1
-        return numbers[index]
-    end
-end 
-
 function find_three()
     for first in numbers
         for second in numbers
