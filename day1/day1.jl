@@ -42,7 +42,7 @@ function find_two()
             othernum = numbers[index[1]]
             println("$i matches with $othernum for product $(i * othernum)")
         end
-    end 
+    end
 end
 
 

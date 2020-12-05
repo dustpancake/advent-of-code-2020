@@ -25,10 +25,6 @@ function load_tile(p::AbstractString)
     data
 end
 
-@inline function check_tree(row::AbstractString, i)::Int64
-    return Int64(row[i] == TREE_SYMB)
-end
-
 @inline function pprow(row::AbstractString, i)
     """ string for pretty print with colours where we are """
     print("(row, i) = \"")
@@ -42,20 +38,20 @@ function descend(m::AbstractTileMap, x_step::Int64, y_step::Int64=1)
     reduced_tilemap = m.tile[y_step+1:y_step:end]
     
     trees = count(
-        (it) -> begin
-            (row, i) = it
-            # pprow(row, i)
-            row[i] == TREE_SYMB
+        (rowi) -> begin # call for each row and index pair
+            (row, i) = rowi
+            pprow(row, i)
+            row[i] == TREE_SYMB # if true, +1
         end,
-        (row, i) for (row, i) in zip(reduced_tilemap, x) # we skip the first row, since move right THEN down
+        pair for pair in zip(reduced_tilemap, x) # we skip the first row, since move right THEN down
     )
     trees
 end
 
-map = Map(load_tile("day3/input.txt"))
-trees = descend(map, 3)
+tilemap = Map(load_tile("day3/input.txt"))
+trees = descend(tilemap, 3)
 println("Trees on 3 right = $trees")
 
 # part 2
-prod = descend(map, 1) * descend(map, 3) * descend(map, 5) * descend(map, 7) * descend(map, 1, 2)
+prod = descend(tilemap, 1) * descend(tilemap, 3) * descend(tilemap, 5) * descend(tilemap, 7) * descend(tilemap, 1, 2)
 println("Product = $prod")

@@ -3,7 +3,7 @@
 const LINE_REGEX = r"(\d+)-(\d+) (\w): (\w+)"
 
 abstract type Policy end
-is_valid(::AbstractString, ::Policy) = error("Not Implemented")
+is_valid(::AbstractString, ::T) where T <: Policy = error("Not Implemented")
 
 struct CountPolicy <: Policy
     range::AbstractRange
@@ -76,7 +76,7 @@ end
 function is_valid(s::AbstractString, p::PositionPolicy)
     first = s[p.pos1] == p.char
     second = length(s) >= p.pos2 ? s[p.pos2] == p.char : false
-    return first ⊻ second # xor
+    return first ⊻ second # xor 
 end
 
 function migrate_policy!(p::Password, new_policy::Type{T}) where T <: Policy
@@ -84,8 +84,5 @@ function migrate_policy!(p::Password, new_policy::Type{T}) where T <: Policy
 end
 
 migrate_policy!.(passwords, PositionPolicy)
-
-valids = validate.(passwords)
-correct = count(i -> i==1, valids)
 
 validate_all()
