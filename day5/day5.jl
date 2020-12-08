@@ -43,4 +43,4 @@ map(x->parse(Int,replace(replace(x,r"[FL]"=>"0"),r"[BR]"=>"1"),base=2),eachline(
 
 # both
 println(map(x->parse(Int,replace(replace(x,r"[FL]"=>"0"),r"[BR]"=>"1"),base=2),eachline("day5/input.txt"))
-    |>sort!|>x->(findmax(x)[1],x[findall(>(1),x[2:end]-x[1:end-1])[1]]+1))
+    |>sort|>x->(findmax(x)[1],x[findall(>(1),x[2:end]-x[1:end-1])[1]]+1))
