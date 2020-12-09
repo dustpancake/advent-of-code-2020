@@ -83,7 +83,7 @@ solution = part2(input, 25, key)
 println("Part 2: sol=$solution")
 
 using BenchmarkTools
-#@btime part2($input, 25, $key)
-#@btime part2b($input, $key)
+@btime part2($input, 25, $key)
+@btime part2b($input, $key)
 
-@btime part1b($input, 25)
+@btime part1($input, 25)
