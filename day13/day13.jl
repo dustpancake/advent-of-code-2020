@@ -22,29 +22,17 @@ end
 function part1()
     t, ids = get_input("day13/input.txt")
     ids = collect(parse(Int, i) for i in split(ids, ",") if i != "x")
-    @btime next_bus(t, ids)
+    @btime next_bus($t, $ids)
 end
 
 # part 2
-
-""" didn't end up using these in favour of chinese remainder theorem, which does what i wanted to with mods
-function bezout(x, y, α, β, c)::Function
-    # a, b have gcd = c. x and y satisfy ax + by = d
-    λ -> (α - λ*(x / c), β + λ*(y / c))
-end
- 
-function diffcalc(id, Δt)
-    (c, α, β) = gcdx(id, Δt)
-    bezout(Δt, id, α, β, c)
-end
-"""
 
 function crt(ids::AbstractArray)
     # https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Existence_(direct_construction)
     N = BigInt(mapreduce(i->i[1], *, ids))
     mod(sum(map((i) -> begin 
             nᵢ, aᵢ = i
-            yᵢ = N ÷ nᵢ
+            yᵢ = N ÷ nᵢ # integer truncated division, Int(floor(N ÷ nᵢ))
             zᵢ = invmod(yᵢ, nᵢ)
             -aᵢ * yᵢ * zᵢ
         end, ids
@@ -54,7 +42,8 @@ end
 function part2()
     t, ids = get_input("day13/input.txt")
     ids = collect((parse(Int, v), i-1) for (i, v) in enumerate(split(ids, ",")) if v != "x")
-    crt(ids)
+    @btime crt($ids)
 end
 
+part1()
 part2()
