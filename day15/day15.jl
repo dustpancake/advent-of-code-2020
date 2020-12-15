@@ -1,41 +1,25 @@
-using DataStructures: DefaultDict, CircularBuffer
 using Test
 using BenchmarkTools: @btime 
 
+PositionLookup = Dict{Int, Int}
 
-PositionStorage = CircularBuffer{Int}
-PositionLookup = DefaultDict{Int, PositionStorage}
-
-function nextitem(item::Int, lookup::PositionLookup)
-    positions = lookup[item]
-    if length(positions) >= 2
-        return positions[end] - positions[end-1]
+@inline function nextitem!(lookup::PositionLookup, item::Int, pos::Int)
+    if haskey(lookup, item)
+        ni = pos - lookup[item]
+        lookup[item] = pos
+        return ni
     else
+        lookup[item] = pos
         return 0
     end
 end
 
-function populate!(lookup::PositionLookup, val::Int, pos::Int)
-    push!(lookup[val], pos)
-end
-
-@inline function populate!(lookup::PositionLookup, input::Array{Int, 1})
-    foreach(i -> populate!(lookup, i[2], i[1]), enumerate(input))
-end
-
-
 function runseries(input::Array{Int, 1}, turns=10)
-    lookup = PositionLookup(_->PositionStorage(2))
-    populate!(lookup, input)
+    ni = pop!(input)
+    lookup = PositionLookup((val, index) for (index, val) in enumerate(input))
 
-    ni = input[end]
-    for i in (1+length(input)):turns
-        #print("Turn $i, processing $ni")
-        ni = nextitem(ni, lookup)
-        #println(" yielding $ni")
-        populate!(lookup, ni, i)
-        #@show lookup
-        #println()
+    for i in (1+length(input)):(turns-1)
+        ni = nextitem!(lookup, ni, i)
     end
 
     ni
@@ -71,4 +55,6 @@ function part2()
 end
 
 @btime part1()
-#@btime part2()
+@time part2()
+
+#runseries([0, 3, 6], 10)
