@@ -59,13 +59,13 @@ function errorrate(tickets::AbstractArray{Int, 2}, fields::AbstractArray{TicketF
 end
 
 # part 1
-function part1(path::String)
-    fields, personal, others = getinput(path)
+function part1(fields, personal, others)
     tickets, fields = parsedata(others, fields)
     errorrate(tickets, fields)
 end
 @testset "Part 1" begin
-    @test part1("day16/test.txt") == 71
+    fields, personal, others = getinput("day16/test.txt")
+    @test part1(fields, personal, others) == 71
 end
 
 
@@ -81,21 +81,6 @@ end
 
 function associatedfields(col::AbstractArray{Int, 1}, fields::AbstractArray{TicketField, 1})::Array{Int, 1}
     findall(field -> validforfield(col, field), fields)
-end
-
-function associatefields!(tickets::AbstractArray{Int, 2}, fields::AbstractArray{TicketField, 1})
-    fieldmap = Dict{Int, TicketField}()
-    while length(fields) > 0
-        for (nc, col) in enumerate(eachcol(tickets))
-            if haskey(fieldmap, nc) continue end
-            index = associatedfields(col, fields)
-            if index > 0
-                fieldmap[nc] = fields[index]
-                popat!(fields, index)
-            end
-        end
-    end
-    fieldmap
 end
 
 @views function associatefields(tickets::AbstractArray{Int, 2}, fields::AbstractArray{TicketField, 1})::Dict{SubString, Int}
@@ -129,18 +114,19 @@ end
     fieldmap
 end
 
-function part2(path::String)
-    fields, personal, others = getinput(path)
+function part2(fields, personal, others)
     push!(others, personal)
     tickets, fields = parsedata(others, fields)
     tickets = validtickets(tickets, fields)
-    
+
     fieldmap = associatefields(tickets, fields)
     
     indexes = [v for (k, v) in fieldmap if occursin(r"^departure", k)]
     prod(tickets[end, indexes])
 end
 
-@btime part2("day16/input.txt")
+fields, personal, others = getinput("day16/input.txt")
+@btime part1(fields, personal, others)
+@btime part2(fields, personal, others)
 
 
