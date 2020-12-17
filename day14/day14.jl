@@ -50,18 +50,16 @@ function part1(input)
 end
 
 input = getinput("day14/input.txt")
-#@btime part1(input)
+# @btime part1(input)
 
-function unwrap(val::Int)
-    digits = []
-    for i in 0:38
-        digit = val & (1 << i)
-        if digit != 0
-            push!(digits, digit)
-        end
+function unwrap(val::Int)::Array{Int, 1}
+    digits = zeros(Int, 38)
+    for i in 0:37
+        digits[i+1] = val & (1 << i)
     end
-    digits
+    filter(!=(0), digits)
 end
+
 
 fpart2 = Dict{String, Function}(
     "mask" => (mem, mask, value) -> begin
@@ -70,10 +68,9 @@ fpart2 = Dict{String, Function}(
     end,
     "mem" => (mem, index, value) -> begin
         root = ( index | mem.maskval ) & ~mem.mask
-        digits = unwrap(mem.mask)
-        for comb in combinations(digits)
-            i = root + sum(comb)
-            mem.memory[i] = value
+        for comb in combinations(unwrap(mem.mask))
+            offset = sum(comb)
+            mem.memory[root + offset] = value
         end
         mem.memory[root] = value
     end
