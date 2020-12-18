@@ -71,4 +71,20 @@ function part2(string::AbstractString)::Int
     eval(parser(expression))
 end
 
-# sum(map(part2, eachline("day18/input.txt")))
+sum(map(part2, eachline("day18/input.txt")))
+
+# i woke up a bit: patched operators method
+function ⊕(x::Int, y::Int)::Int # lower precedence (\oplus)
+    x * y 
+end
+
+function ⊗(x::Int, y::Int)::Int # raise precedence (\otimes)
+    x + y
+end
+
+function patchoperators(input::AbstractString)
+    replace(replace(input, "*" => "⊕"), "+" => "⊗")
+end
+
+input = patchoperators.(eachline("day18/input.txt"))
+solution = sum(map(i->eval(Meta.parse(i)), input))
