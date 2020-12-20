@@ -83,9 +83,6 @@ end
 function orientcorner(tile::Tile, em::EdgeMapping)
     # top and left need to be disconnected
     orientation = map(i->haskey(em, i) && length(em[i]) == 1, tile.edgevalues)
-    println("BEFORE")
-    visualise(tile.matrix)
-    @show orientation
     if orientation == [1, 1, 0, 0]  # tr
         return flip(tile)
     elseif orientation == [0, 1, 1, 0] # rb
@@ -137,7 +134,6 @@ function maketilemap!(ts::TileSet)::Matrix{Int}
     corners = getcorners(em)
 
     tilemap[1, 1] = corners[1]
-    @show corners[1]
     # orient first corner
     ts[corners[1]] = orientcorner(ts[corners[1]], em)
     # fill the rest
@@ -236,16 +232,17 @@ end
             push!(counts, count)
             rendermap = flip(rendermap)
         end
-        rendermap = rotate(rendermap)
+        rendermap = rotr90(rendermap)
     end
-    maximum(counts)
+    maximum(counts) * sum(stencil)
 end
 
 function part2()
-    tileset = readtileset("day20/test.txt")
+    tileset = readtileset("day20/input.txt")
     rendermap = render(maketilemap!(tileset), tileset)
     rendermap = trimsquares(rendermap)
     #visualise(rendermap)
+    count(==(1), rendermap) - maxmonster!(rendermap)
 end
 
 part2()
