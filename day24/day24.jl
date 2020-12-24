@@ -29,6 +29,8 @@ function part1(input)
     length(input) - (2 * (length(input) - length(unique(input)))) 
 end
 
+
+
 # part 2
 
 function nestedminmax(i::AbstractArray)::Tuple{Int, Int}
@@ -48,7 +50,6 @@ end
     rep
 end
 
-
 const stencil = Int[
     0 1 0 1 0 ;
     1 0 0 0 1 ;
@@ -58,11 +59,11 @@ const stencil = Int[
     sum(mat .* stencil)
 end
 
-function mapper(f::Function, grid::Matrix{Int}; shift::Int=0)
+function mapper(f::Function, grid::Matrix{Int})
     (rows, cols) = size(grid) .- (2, 4)
     for row in 1:rows
         # only walk diagonals
-        start = row % 2 == 1 ? 1+shift : 2-shift
+        start = row % 2 == 1 ? 2 : 1
         for col in start:2:cols
             f(row+1, col+2) # accounts for padding
         end
@@ -85,7 +86,7 @@ function applyrules(curr::Int, conv::Int)::Int
     end
 end
 
-@views function evolve!(ref::Matrix{Int}, dest::Matrix{Int}, shift::Int)
+@views function evolve!(ref::Matrix{Int}, dest::Matrix{Int})
     mapper((row, col) -> begin
             section = ref[row-1:row+1, col-2:col+2]
             curr = ref[row, col]
@@ -93,8 +94,6 @@ end
             dest[row, col] = applyrules(curr, conv)
         end,
         ref
-        ; 
-        shift=shift
     )
 end
 
@@ -107,18 +106,17 @@ function addpadding(grid::Matrix{Int})
     blank
 end
 
-function evolve(grid::Matrix{Int}, shift::Int=0)
+function evolve(grid::Matrix{Int})
     # bump 8 in x, 4 in y, else miss edges in convolution
     grid = addpadding(grid)
     output = copy(grid)
-    evolve!(grid, output, shift)
+    evolve!(grid, output)
     output
 end
 
 function run!(grid::Matrix{Int}, times::Int)
-    for i in 1:times
-        #shift = (i % 2) == 1 ? 1 : 0 # shift is redundant actually
-        grid = evolve(grid, 1)
+    for _ in 1:times
+        grid = evolve(grid)
     end
     grid 
 end
